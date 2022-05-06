@@ -110,20 +110,32 @@ int main(void)
     std::cout << glGetString(GL_VERSION) << std::endl;
 
     //Create positions for vertex buffer
-    float positions[6] = {
-        -0.5f, -0.5,
-        0.0f, 0.5f,
-        0.5f, -0.5f
+    float positions[] = {
+        -0.5f, -0.5f,
+        0.5f, -0.5f,
+        0.5f, 0.5f,
+        -0.5f, 0.5f
+    };
+
+    unsigned int indices[] = {
+        0, 1, 2,
+        2, 3, 0
     };
 
     //Create vertex buffer
     unsigned int buffer;
     glGenBuffers(1, &buffer);
     glBindBuffer(GL_ARRAY_BUFFER, buffer);
-    glBufferData(GL_ARRAY_BUFFER, 6 * sizeof(float), positions, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, 8 * sizeof(float), positions, GL_STATIC_DRAW);
 
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, 0);
+
+    //Create index buffer
+    unsigned int ibo;
+    glGenBuffers(1, &ibo);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, 6 * sizeof(unsigned int), indices, GL_STATIC_DRAW);
 
     ShaderProgramSource source = ParseShader("res/shaders/Basic.shader");
     std::cout << "---Vertex---" << std::endl;
@@ -131,7 +143,7 @@ int main(void)
     std::cout << "---Fragment---" << std::endl;
     std::cout << source.FragmentSource << std::endl;
 
-    unsigned int shader = CreateShader(source.VertexSource,source.FragmentSource);
+   unsigned int shader = CreateShader(source.VertexSource,source.FragmentSource);
    glUseProgram(shader);
 
     //glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -143,7 +155,7 @@ int main(void)
         glClear(GL_COLOR_BUFFER_BIT);
 
         // Draw call
-        glDrawArrays(GL_TRIANGLES, 0, 3);
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
         
         /* Swap front and back buffers */
         glfwSwapBuffers(window);
